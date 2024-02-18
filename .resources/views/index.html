@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="renderer" content="webkit" />
+  <title>用户登录 - 禅道</title>
+  <base href="http://giant.work" />
+  <link
+    rel="stylesheet"
+    href="/theme/default/zh-cn.default.css?v=ipd1.2"
+    type="text/css"
+    media="screen"
+  />
+  <script src="/js/all.js?v=ipd1.2"></script>
+  <style>
+      #featurebar ul.nav li .chosen-container a.chosen-single {
+          background: #f8fafe;
+          border: none;
+          -webkit-box-shadow: none;
+          box-shadow: none;
+          padding-top: 5px;
+      }
+
+      .w-verifyPassword {
+          width: 120px !important;
+      }
+
+      .w-enVerifyPassword {
+          width: 150px !important;
+      }
+
+      .c-id {
+          width: 70px;
+      }
+
+      .c-hours {
+          width: 110px;
+      }
+
+      #mainContent table > tbody > tr > td > div.text-danger.help-text {
+          word-break: break-all;
+      }
+
+      body {
+          background: #1183fb linear-gradient(-90deg, #0a48d1 0%, #1183fb 100%);
+          background-color: #1183fb;
+      }
+
+      #login {
+          max-width: 720px !important;
+          margin: 0 auto;
+          margin-top: 5%;
+      }
+
+      #loginPanel {
+          background: #fff;
+          overflow: hidden;
+          box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.1);
+          border-radius: 3px;
+      }
+
+      #loginPanel header {
+          position: relative;
+      }
+
+      #loginPanel header > h2 {
+          font-size: 16px;
+          margin: 0;
+          line-height: 32px;
+          /*max-width: calc(100% - 90px);*/
+          display: inline-block;
+      }
+
+      #logo-box {
+          background-size: cover;
+          background-position: center;
+          position: relative;
+      }
+
+      #login-logo,
+      #login-ai {
+          position: absolute;
+          left: 50%;
+          transform: translateX(-50%);
+      }
+
+      .col-7 {
+          padding: 24px 40px 0 40px;
+      }
+
+      .table-form > tbody > tr > td {
+          padding: 0 0 7px 0;
+      }
+
+      html[lang="en"] #loginPanel .table-form > tbody > tr > th {
+          width: 80px;
+      }
+
+      #loginPanel > footer {
+          background: #eee;
+          padding: 20px;
+          color: #838a9d;
+      }
+
+      #loginPanel > footer a {
+          display: inline-block;
+          margin-left: 5px;
+      }
+
+      #info {
+          margin-top: 10px;
+          color: #fff;
+      }
+
+      #info .btn + .btn {
+          margin-left: 5px;
+      }
+
+      #langs {
+          display: inline-block;
+          float: right;
+          position: absolute;
+          right: 0;
+      }
+
+      #langs > .btn,
+      #langs > .dropdown-menu {
+          min-width: 0;
+          width: 85px;
+      }
+
+      #loginForm {
+          margin: 32px 0 50px 0;
+      }
+
+      #resetPassword {
+          text-align: right;
+      }
+
+      .captchaBox .input-group .input-group-addon {
+          width: 110px;
+          padding: 0px;
+      }
+
+      .form-actions {
+          padding-bottom: 0 !important;
+      }
+
+      .form-actions > button {
+          width: 100%;
+          margin-top: 28px;
+      }
+
+      .showNotice {
+          color: yellow;
+      }
+
+      .showNotice:hover {
+          color: yellow;
+      }
+
+      .table-row-extension .alert {
+          margin-bottom: 0px !important;
+      }
+
+      .table-row-extension .content {
+          color: #3c4353;
+      }
+
+      .table-row-extension .expired-tips {
+          cursor: pointer;
+      }
+
+      [lang^="fr"] #loginPanel .table-form > tbody > tr > th {
+          width: 100px;
+      }
+
+      #updater {
+          display: none;
+      }
+  </style>
+  <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+  <!--[if lt IE 10]>
+  <script src="/js/jquery/placeholder/min.js?v=ipd1.2"></script>
+  <![endif]-->
+  <style>
+      #editorSteps .nav-primary > li.active > a,
+      #editorSteps .nav-primary > li.active > a:focus,
+      #editorSteps .nav-primary > li.active > a:hover {
+          color: #fff;
+      }
+
+      .menu.leftmenu .nav-primary > li {
+          width: 100%;
+      }
+
+      .menu.leftmenu .nav-primary > li > a {
+          border: none;
+      }
+  </style>
+  <script>
+    workflowNavGroup = [];
+  </script>
+  <style>
+      .outer .with-side .side,
+      .outer .with-side .side + .main {
+          visibility: visible;
+      }
+
+      #featurebar {
+          margin: -8px 0 10px;
+      }
+
+      #featurebar .nav:after {
+          clear: left;
+      }
+
+      #featurebar .nav li {
+          float: left;
+          margin-right: 10px;
+          padding: 6px;
+      }
+
+      #featurebar .nav li a {
+          padding: 0px;
+      }
+
+      #featurebar .nav li.active a {
+          top: -1px;
+          display: inline-block;
+          font-weight: 700;
+          color: #006af1;
+      }
+
+      #featurebar .nav li.active a:after {
+          position: absolute;
+          bottom: -5px;
+          display: block;
+          width: 100%;
+          content: " ";
+          border-bottom: 2px solid #006af1;
+      }
+
+      #main #menuActions {
+          margin-top: -40px !important;
+      }
+
+      .with-side .side {
+          left: auto;
+      }
+
+      .icon-remove:before {
+          content: "\e90d";
+      }
+
+      .with-side .side .panel .panel-body {
+          padding: 10px;
+      }
+
+      .tablesorter thead > tr > th > a {
+          position: relative;
+          display: inline-block;
+          padding-right: 16px;
+          color: #3c4353;
+      }
+
+      .tablesorter thead > tr > th > a:after,
+      .tablesorter thead > tr > th > a:before {
+          position: absolute;
+          top: 0;
+          right: 0;
+          font-family: ZentaoIcon;
+          font-size: 14px;
+          font-style: normal;
+          font-weight: 400;
+          font-variant: normal;
+          line-height: 1.1;
+          color: #3c4353;
+          text-transform: none;
+          content: "\f0de";
+          opacity: 0.5;
+      }
+
+      .tablesorter thead > tr > th > a:after {
+          content: "\f0dd";
+      }
+
+      .tablesorter thead > tr > th > a.sort-down,
+      .tablesorter thead > tr > th > a.sort-up,
+      .tablesorter thead > tr > th > a:hover {
+          color: #006af1;
+          text-decoration: none;
+      }
+
+      .tablesorter thead > tr > th > a.sort-down:after,
+      .tablesorter thead > tr > th > a.sort-up:before,
+      .tablesorter thead > tr > th > a:hover:after,
+      .tablesorter thead > tr > th > a:hover:before {
+          color: #006af1;
+          opacity: 1;
+      }
+  </style>
+  <style>
+      #navbar ul.nav {
+          padding-left: 10px;
+      }
+
+      #navbar ul.nav li.divider {
+          margin: 15px 10px;
+      }
+  </style>
+</head>
+<body class="">
+<script src="/js/md5.js?v=ipd1.2"></script>
+<script>
+  loginTimeoutTip =
+    "\u7cfb\u7edf\u767b\u5f55\u5931\u8d25\uff0c\u8bf7\u68c0\u67e5\u4ee3\u7406\u670d\u52a1\u662f\u5426\u6b63\u5e38";
+</script>
+<main id="main" class="fade no-padding">
+  <div class="container" id="login">
+    <div id="loginPanel">
+      <div class="table-row">
+        <div
+          class="col-5 text-center"
+          id="logo-box"
+          style="
+                background-image: url(/theme/default/images/main/zt-login-bg.svg);
+              "
+        >
+          <img
+            id="login-logo"
+            style="top: 60px"
+            src="/theme/default/images/main/zt-login-logo.svg"
+          />
+          <img
+            id="login-ai"
+            style="bottom: 48px"
+            src="/theme/default/images/main/zt-login-ai.svg"
+          />
+        </div>
+        <div class="col-7">
+          <header>
+            <h2>Giant Technology 项目管理系统</h2>
+            <p>已为你自动创建账户，请牢记您的账户和密码</p>
+          </header>
+          <form method="post" target="hiddenwin" id="loginForm">
+            <table class="table table-form">
+              <tbody>
+              <tr>
+                <td colspan="2">用户名</td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <input
+                    readonly
+                    value=""
+                    class="form-control"
+                    type="text"
+                    name="account"
+                    id="account"
+                    autocomplete="off"
+                    autofocus
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2">密码</td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <input
+                    readonly
+                    value=""
+                    class="form-control"
+                    type="text"
+                    name="password"
+                    autocomplete="off"
+                  />
+                </td>
+              </tr>
+
+              <tr>
+                <td class="form-actions" colspan="2">
+                  <button
+                    type="submit"
+                    id="submit"
+                    class="btn btn-primary"
+                    data-loading="稍候..."
+                    onclick="window.location.href = ''"
+                  >
+                    登录
+                  </button>
+                  <input
+                    type="hidden"
+                    name="referer"
+                    id="referer"
+                    value="/"
+                  />
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div id="info" class="table-row">
+      <div class="table-col text-middle text-center">
+        <div id="poweredby"></div>
+      </div>
+    </div>
+  </div>
+</main>
+<script>
+  $(document).ready(() => {
+    const $login = $('#login');
+    const adjustPanelPos = () => {
+      const bestTop = Math.max(0, Math.floor($(window).height() - $login.outerHeight()) / 2);
+      $login.css('margin-top', bestTop);
+    };
+    adjustPanelPos();
+    $(window).on('resize', adjustPanelPos);
+  });
+</script>
+</body>
+</html>
+

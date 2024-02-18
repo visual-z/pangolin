@@ -10,11 +10,14 @@ export class AuthController {
   constructor(private httpService: HttpService) {}
   @Get('github')
   @UseGuards(AuthGuard('github'))
-  githubLogin() {}
+  public githubLogin() {}
 
   @Get('github/callback')
   @UseGuards(AuthGuard('github'))
-  async githubLoginCallback(@Req() request: any, @Res() response: Response) {
+  public async githubLoginCallback(
+    @Req() request: any,
+    @Res() response: Response,
+  ) {
     const authUser = request.user;
 
     // 获取token
@@ -50,13 +53,12 @@ export class AuthController {
       if (result === true) {
         console.log('查找到认证用户，进行免密登录');
         const timestamp = Date.now().toString();
+        const token = createHash('md5')
+          .update('test0' + 'c6080a832a3ebe1d55f3b1d382a6ed9c' + timestamp)
+          .digest('hex');
 
         response.redirect(
-          `http://127.0.0.1/api.php?m=user&f=apilogin&account=${authUser.nodeId}&code=test0&time=${timestamp}&token=${createHash(
-            'md5',
-          )
-            .update('test0' + 'c6080a832a3ebe1d55f3b1d382a6ed9c' + timestamp)
-            .digest('hex')}`,
+          `http://127.0.0.1/api.php?m=user&f=apilogin&account=${authUser.nodeId}&code=test0&time=${timestamp}&token=${token}`,
         );
       } else {
         // 创建用户
@@ -78,6 +80,11 @@ export class AuthController {
             },
           )
           .then(() => {
+            /* TODO 拆分逻辑到service
+             * 1. 生成账户密码后将用户的账号密码输出到网页展示
+             * 2. 账号使用oidc的用户名
+             * 3. 使用hbr模板
+             */
             console.log('查找到认证用户，进行免密登录');
             const timestamp = Date.now().toString();
 
