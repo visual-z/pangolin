@@ -5,11 +5,9 @@ import { Logger } from '@nestjs/common';
 
 const logger = new Logger(MainModule.name);
 
-const builder = NestFactory.create<NestExpressApplication>(MainModule, {
+NestFactory.create<NestExpressApplication>(MainModule, {
   forceCloseConnections: false,
-});
-
-builder.then((application) => {
+}).then((application) => {
   // 启动核心程序
   application.listen(3000).then(() => {
     application

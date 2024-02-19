@@ -356,7 +356,7 @@
                 <td colspan="2">
                   <input
                     readonly
-                    value=""
+                    value={{username}}
                     class="form-control"
                     type="text"
                     name="account"
@@ -373,7 +373,7 @@
                 <td colspan="2">
                   <input
                     readonly
-                    value=""
+                    value={{password}}
                     class="form-control"
                     type="text"
                     name="password"
@@ -389,7 +389,7 @@
                     id="submit"
                     class="btn btn-primary"
                     data-loading="稍候..."
-                    onclick="window.location.href = ''"
+                    onclick="window.location.href = '{{loginUrl}}'"
                   >
                     登录
                   </button>

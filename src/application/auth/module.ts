@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
-import { AuthController } from './controller';
-import { GithubStrategy } from './service';
+import { AuthenticationController } from './controller';
+import { AuthenticationService } from './service';
 import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [HttpModule],
-  controllers: [AuthController],
-  providers: [GithubStrategy],
+  controllers: [AuthenticationController],
+  providers: [AuthenticationService],
 })
-export class AuthApplicationModule {}
+export class AuthenticationApplicationModule {}
