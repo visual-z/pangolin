@@ -1,14 +1,15 @@
 import { Controller, Get, Query, Req, Res } from '@nestjs/common';
 import { AuthenticationService } from './service';
 import { Request, Response } from 'express';
-import * as process from 'process';
 import { HttpService } from '@nestjs/axios';
 import { User } from './typings';
+import { ConfigService } from '@nestjs/config';
 
 @Controller()
 export class AuthenticationController {
   public constructor(
     private httpService: HttpService,
+    private readonly configService: ConfigService,
     private readonly authenticationService: AuthenticationService,
   ) {}
 
@@ -20,33 +21,40 @@ export class AuthenticationController {
   ): Promise<void> {
     if (code) {
       //
-      const payload = await this.authenticationService
-        .getClient()
-        .callback(
-          process.env.ZENTAO_IDENTITY_OPENID_REDIRECT_URI,
-          this.authenticationService.getClient().callbackParams(request),
+      try {
+        const payload = await this.authenticationService
+          .getClient()
+          .callback(
+            this.configService.get('OPENID_REDIRECT_URI'),
+            this.authenticationService.getClient().callbackParams(request),
+          );
+        //
+        const userInfo = await this.authenticationService
+          .getClient()
+          .userinfo(payload.access_token);
+        //
+        const tokenResponse = await this.httpService.axiosRef.post(
+          `${this.configService.get('ZENTAO_URL')}/api.php/v1/tokens`,
+          {
+            account: this.configService.get('ZENTAO_TOKEN_ACCOUNT'),
+            password: this.configService.get('ZENTAO_TOKEN_PASSWORD'),
+          },
         );
-      //
-      const userInfo = await this.authenticationService
-        .getClient()
-        .userinfo(payload.access_token);
-      const tokenResponse = await this.httpService.axiosRef.post(
-        `${process.env.ZENTAO_IDENTITY_URL}/api.php/v1/tokens`,
-        {
-          account: process.env.ZENTAO_IDENTITY_TOKEN_ACCOUNT,
-          password: process.env.ZENTAO_IDENTITY_TOKEN_PASSWORD,
-        },
-      );
-      await this.authenticationService.getZenTaoUser(
-        response,
-        <User.Info>userInfo,
-        tokenResponse,
-      );
+        //
+        await this.authenticationService.getZenTaoUser(
+          response,
+          <User.Info>userInfo,
+          tokenResponse,
+        );
+      } catch (error) {
+        console.log(error);
+        response.status(500);
+      }
     } else {
       response.redirect(
         this.authenticationService.getClient().authorizationUrl({
-          scope: process.env.ZENTAO_IDENTITY_OPENID_SCOPE,
-          redirect_uri: process.env.ZENTAO_IDENTITY_OPENID_REDIRECT_URI,
+          scope: this.configService.get('OPENID_SCOPE'),
+          redirect_uri: this.configService.get('OPENID_REDIRECT_URI'),
         }),
       );
     }

@@ -9,3 +9,28 @@ export declare namespace User {
     phone_number_verified: boolean;
   };
 }
+type config = {
+  zentao: {
+    code: string;
+    key: string;
+    account: string;
+    password: string;
+    url: string;
+  };
+  openid: {
+    configUrl: string;
+    redirectUrl: string;
+    scope: string;
+    client: {
+      id: string;
+      secret: string;
+    };
+  };
+  redis: {
+    password: string;
+    socket: {
+      host: string;
+      port: number;
+    };
+  };
+};
