@@ -2,16 +2,11 @@ import { Module } from '@nestjs/common';
 import { AuthenticationController } from './controller';
 import { AuthenticationService } from './service';
 import { HttpModule } from '@nestjs/axios';
-import { ConfigModule } from '@nestjs/config';
+import { AuthenticationTask } from './task';
 
 @Module({
-  imports: [
-    HttpModule,
-    ConfigModule.forRoot({
-      envFilePath: '.resources/.env',
-    }),
-  ],
+  imports: [HttpModule],
   controllers: [AuthenticationController],
-  providers: [AuthenticationService],
+  providers: [AuthenticationService, AuthenticationTask],
 })
 export class AuthenticationApplicationModule {}

@@ -1,16 +1,18 @@
-import { Controller, Get, Query, Req, Res } from '@nestjs/common';
+import { Controller, Get, Inject, Query, Req, Res } from '@nestjs/common';
 import { AuthenticationService } from './service';
 import { Request, Response } from 'express';
-import { HttpService } from '@nestjs/axios';
 import { User } from './typings';
+import { AuthenticationTask } from './task';
 import { ConfigService } from '@nestjs/config';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @Controller()
 export class AuthenticationController {
   public constructor(
-    private httpService: HttpService,
     private readonly configService: ConfigService,
+    private readonly authenticationTask: AuthenticationTask,
     private readonly authenticationService: AuthenticationService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   @Get('/')
@@ -21,35 +23,27 @@ export class AuthenticationController {
   ): Promise<void> {
     if (code) {
       //
-      try {
-        const payload = await this.authenticationService
-          .getClient()
-          .callback(
-            this.configService.get('OPENID_REDIRECT_URI'),
-            this.authenticationService.getClient().callbackParams(request),
-          );
-        //
-        const userInfo = await this.authenticationService
-          .getClient()
-          .userinfo(payload.access_token);
-        //
-        const tokenResponse = await this.httpService.axiosRef.post(
-          `${this.configService.get('ZENTAO_URL')}/api.php/v1/tokens`,
-          {
-            account: this.configService.get('ZENTAO_TOKEN_ACCOUNT'),
-            password: this.configService.get('ZENTAO_TOKEN_PASSWORD'),
-          },
+      const payload = await this.authenticationService
+        .getClient()
+        .callback(
+          this.configService.get('OPENID_REDIRECT_URI'),
+          this.authenticationService.getClient().callbackParams(request),
         );
-        //
-        await this.authenticationService.getZenTaoUser(
-          response,
-          <User.Info>userInfo,
-          tokenResponse,
-        );
-      } catch (error) {
-        console.log(error);
-        response.status(500);
+      //
+      const userInfo = await this.authenticationService
+        .getClient()
+        .userinfo(payload.access_token);
+      //
+      const token: string | null = await this.cacheManager.get('token');
+      if (!token) {
+        await this.authenticationTask.getToken();
       }
+      //
+      await this.authenticationService.getZenTaoUser(
+        response,
+        <User.Info>userInfo,
+        token,
+      );
     } else {
       response.redirect(
         this.authenticationService.getClient().authorizationUrl({

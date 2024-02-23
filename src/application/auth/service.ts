@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { BaseClient, Client, Issuer } from 'openid-client';
 import { HttpService } from '@nestjs/axios';
 import { createHash } from 'crypto';
@@ -8,14 +8,21 @@ import { User } from './typings';
 import * as handlebars from 'handlebars';
 import * as fs from 'fs';
 import { ConfigService } from '@nestjs/config';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
+import { AuthenticationTask } from './task';
+import { RedisStore } from 'cache-manager-redis-yet';
 
 @Injectable()
 export class AuthenticationService {
   private client: Client;
+  private readonly logger: Logger = new Logger(AuthenticationService.name);
 
   public constructor(
     private httpService: HttpService,
     private configService: ConfigService,
+    private authenticationTask: AuthenticationTask,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache<RedisStore>,
   ) {
     Issuer.discover(this.configService.get('OPENID_CONFIG_URL')).then(
       (issuer) => {
@@ -32,71 +39,55 @@ export class AuthenticationService {
   public async getZenTaoUser(
     response: Response,
     userInfo: User.Info,
-    tokenResponse: { data: { token: string } },
+    token: string,
   ) {
-    if (tokenResponse.data.token) {
-      try {
-        const userResponse = await this.httpService.axiosRef.get(
+    try {
+      // 缓存
+      const result = await this.cacheManager.store.client.SISMEMBER(
+        'userList',
+        userInfo.name,
+      );
+      if (result === false) {
+        // 创建用户
+        const password = generateRandomPassword(32);
+        await this.httpService.axiosRef.post(
           `${this.configService.get('ZENTAO_URL')}/api.php/v1/users`,
           {
+            account: userInfo.preferred_username,
+            password,
+            realname: userInfo.name,
+          },
+          {
             headers: {
-              Token: tokenResponse.data.token,
-            },
-            params: {
-              page: 1,
-              limit: 1024,
+              Token: token,
             },
           },
         );
-        // 查询用户
-        let result = false;
-        for (const user of userResponse.data.users) {
-          if (user.account === userInfo.preferred_username) {
-            result = true;
-            break;
-          }
-        }
-        if (result === false) {
-          // 创建用户
-          const password = generateRandomPassword(32);
-          await this.httpService.axiosRef.post(
-            `${this.configService.get('ZENTAO_URL')}/api.php/v1/users`,
-            {
-              account: userInfo.preferred_username,
-              password,
-              realname: userInfo.name,
-            },
-            {
-              headers: {
-                Token: tokenResponse.data.token,
-              },
-            },
-          );
-          // 输出用户名和密码到网页端
-          const contentFile = handlebars.compile(
-            fs.readFileSync('.resources/views/index.hbs', 'utf8'),
-          );
-          response.send(
-            contentFile({
-              username: userInfo.preferred_username,
-              password,
-              loginUrl: this.login(userInfo),
-            }),
-          );
-        } else {
-          response.redirect(this.login(<User.Info>userInfo));
-        }
-      } catch (error) {
-        console.log(error);
+        await this.authenticationTask.getUserList();
+        // 输出用户名和密码到网页端
+        const contentFile = handlebars.compile(
+          fs.readFileSync('.resources/views/index.hbs', 'utf8'),
+        );
+        response.send(
+          contentFile({
+            username: userInfo.preferred_username,
+            password,
+            loginUrl: this.login(userInfo),
+          }),
+        );
+      } else {
+        response.redirect(this.login(<User.Info>userInfo));
       }
-    } else {
-      response.status(500).json(tokenResponse);
+    } catch (error) {
+      this.logger.error(error);
+      response.status(500);
     }
   }
 
   public getClient(): BaseClient {
     return this.client;
   }
+
   public login(userInfo: User.Info) {
     const timestamp = Date.now().toString();
     const token = createHash('md5')
