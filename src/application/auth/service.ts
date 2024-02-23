@@ -44,7 +44,7 @@ export class AuthenticationService {
     try {
       // 缓存
       const result = await this.cacheManager.store.client.SISMEMBER(
-        'userList',
+        'zentao:userList',
         userInfo.name,
       );
       if (result === false) {

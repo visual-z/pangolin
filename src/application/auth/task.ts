@@ -26,7 +26,7 @@ export class AuthenticationTask implements OnApplicationBootstrap {
   }
 
   public async getToken() {
-    await this.cacheManager.store.client.del('token');
+    await this.cacheManager.store.client.del('zentao:token');
     const tokenResponse = await this.httpService.axiosRef.post(
       `${this.configService.get('ZENTAO_URL')}/api.php/v1/tokens`,
       {
@@ -34,15 +34,19 @@ export class AuthenticationTask implements OnApplicationBootstrap {
         password: this.configService.get('ZENTAO_TOKEN_PASSWORD'),
       },
     );
-    await this.cacheManager.set('token', tokenResponse.data.token, 2 ** 21);
+    await this.cacheManager.set(
+      'zentao:token',
+      tokenResponse.data.token,
+      2 ** 21,
+    );
   }
 
   public async getUserList() {
-    await this.cacheManager.store.client.del('token');
-    let token: string = await this.cacheManager.get('token');
+    await this.cacheManager.store.client.del('zentao:token');
+    let token: string = await this.cacheManager.get('zentao:token');
     if (!token) {
       await this.getToken();
-      token = await this.cacheManager.get('token');
+      token = await this.cacheManager.get('zentao:token');
     }
     try {
       const userList = (
@@ -59,7 +63,7 @@ export class AuthenticationTask implements OnApplicationBootstrap {
           },
         )
       ).data.users.map((user: { account: string }) => user.account);
-      await this.cacheManager.store.client.sAdd('userList', userList);
+      await this.cacheManager.store.client.sAdd('zentao:userList', userList);
     } catch (error) {
       this.logger.error(error);
     }
