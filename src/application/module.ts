@@ -1,5 +1,5 @@
 import { DynamicModule, Module } from '@nestjs/common';
-import { AuthenticationApplicationModule } from './auth/module';
+import { AuthenticationApplicationModule } from './authentication/module';
 
 @Module({
   imports: [AuthenticationApplicationModule],

@@ -26,7 +26,9 @@ export class AuthenticationController {
       const payload = await this.authenticationService
         .getClient()
         .callback(
-          this.configService.get('OPENID_REDIRECT_URI'),
+          this.configService.getOrThrow(
+            'application.authentication.openid.redirectUri',
+          ),
           this.authenticationService.getClient().callbackParams(request),
         );
       //
@@ -47,8 +49,12 @@ export class AuthenticationController {
     } else {
       response.redirect(
         this.authenticationService.getClient().authorizationUrl({
-          scope: this.configService.get('OPENID_SCOPE'),
-          redirect_uri: this.configService.get('OPENID_REDIRECT_URI'),
+          scope: this.configService.getOrThrow(
+            'application.authentication.openid.scope',
+          ),
+          redirect_uri: this.configService.getOrThrow(
+            'application.authentication.openid.redirectUri',
+          ),
         }),
       );
     }

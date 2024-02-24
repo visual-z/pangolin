@@ -24,16 +24,26 @@ export class AuthenticationService {
     private authenticationTask: AuthenticationTask,
     @Inject(CACHE_MANAGER) private readonly cacheManager: Cache<RedisStore>,
   ) {
-    Issuer.discover(this.configService.get('OPENID_CONFIG_URL')).then(
-      (issuer) => {
-        this.client = new issuer.Client({
-          client_id: this.configService.get('OPENID_CLIENT_ID'),
-          client_secret: this.configService.get('OPENID_CLIENT_SECRET'),
-          redirect_uris: [this.configService.get('OPENID_REDIRECT_URI')],
-          response_types: ['code'],
-        });
-      },
-    );
+    Issuer.discover(
+      this.configService.getOrThrow(
+        'application.authentication.openid.configUrl',
+      ),
+    ).then((issuer) => {
+      this.client = new issuer.Client({
+        client_id: this.configService.getOrThrow(
+          'application.authentication.openid.clientID',
+        ),
+        client_secret: this.configService.getOrThrow(
+          'application.authentication.openid.clientSecret',
+        ),
+        redirect_uris: [
+          this.configService.getOrThrow(
+            'application.authentication.openid.redirectUri',
+          ),
+        ],
+        response_types: ['code'],
+      });
+    });
   }
 
   public async getZenTaoUser(
@@ -51,7 +61,7 @@ export class AuthenticationService {
         // 创建用户
         const password = generateRandomPassword(32);
         await this.httpService.axiosRef.post(
-          `${this.configService.get('ZENTAO_URL')}/api.php/v1/users`,
+          `${this.configService.getOrThrow('application.authentication.zentao.url')}/api.php/v1/users`,
           {
             account: userInfo.preferred_username,
             password,
@@ -92,11 +102,11 @@ export class AuthenticationService {
     const timestamp = Date.now().toString();
     const token = createHash('md5')
       .update(
-        `${this.configService.get('ZENTAO_CODE')}` +
-          `${this.configService.get('ZENTAO_KEY')}` +
+        `${this.configService.getOrThrow('application.authentication.zentao.code')}` +
+          `${this.configService.getOrThrow('application.authentication.zentao.key')}` +
           timestamp,
       )
       .digest('hex');
-    return `${this.configService.get('ZENTAO_URL')}/api.php?m=user&f=apilogin&account=${userInfo.preferred_username}&code=${this.configService.get('ZENTAO_CODE')}&time=${timestamp}&token=${token}`;
+    return `${this.configService.getOrThrow('application.authentication.zentao.url')}/api.php?m=user&f=apilogin&account=${userInfo.preferred_username}&code=${this.configService.getOrThrow('application.authentication.zentao.code')}&time=${timestamp}&token=${token}`;
   }
 }

@@ -12,11 +12,11 @@ LABEL org.opencontainers.image.authors="Giant Technology, Inc."
 # > > 来源
 LABEL org.opencontainers.image.source="https://giant.space/p/zoo/repositories/pangolin"
 # > 工作目录
-WORKDIR /opt/puff
+WORKDIR /opt/pangolin
 # > 启动命令
 ENTRYPOINT [ "node", "dist/main.js" ]
 # > 端口
-EXPOSE 1119
+EXPOSE 3000
 
 # 构建程序
 # > 安装依赖
@@ -28,7 +28,9 @@ RUN npm config set strict-ssl false; \
 # > > 复制依赖配置文件
 COPY package.json pnpm-lock.yaml ./
 # > > 安装
-RUN npm install --force
+# > > > 安装
+RUN npm install -g pnpm; \
+    pnpm install;
 # > 构建
 # > > 复制其他文件
 COPY . .

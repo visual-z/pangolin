@@ -35,6 +35,12 @@ dependencies:
   handlebars:
     specifier: ^4.7.8
     version: 4.7.8
+  js-yaml:
+    specifier: ^4.1.0
+    version: 4.1.0
+  lodash:
+    specifier: ^4.17.21
+    version: 4.17.21
   openid-client:
     specifier: ^5.6.4
     version: 5.6.4
@@ -61,6 +67,12 @@ devDependencies:
   '@types/jest':
     specifier: ^29.5.2
     version: 29.5.12
+  '@types/js-yaml':
+    specifier: ^4.0.9
+    version: 4.0.9
+  '@types/lodash':
+    specifier: ^4.14.202
+    version: 4.14.202
   '@types/node':
     specifier: ^20.3.1
     version: 20.11.19
@@ -1301,8 +1313,16 @@ packages:
       pretty-format: 29.7.0
     dev: true
 
+  /@types/js-yaml@4.0.9:
+    resolution: {integrity: sha512-k4MGaQl5TGo/iipqb2UDG2UwjXziSWkh0uysQelTlJpX1qGlpUZYm8PnO4DxG1qBomtJUdYJ6qR6xdIah10JLg==}
+    dev: true
+
   /@types/json-schema@7.0.15:
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
+    dev: true
+
+  /@types/lodash@4.14.202:
+    resolution: {integrity: sha512-OvlIYQK9tNneDlS0VN54LLd5uiPCBOp7gS5Z0f1mjoJYBrtStzgmJBxONW3U6OZqdtNzZPmn9BS/7WI7BFFcFQ==}
     dev: true
 
   /@types/luxon@3.3.8:
@@ -1771,7 +1791,6 @@ packages:
 
   /argparse@2.0.1:
     resolution: {integrity: sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==}
-    dev: true
 
   /array-flatten@1.1.1:
     resolution: {integrity: sha512-PCVAQswWemu6UdxsDFFX/+gVeYqKAod3D3UVm91jHwynguOwAvYPhx8nNlM++NqRcK6CxxpUafjmhIdKiHibqg==}
@@ -3834,7 +3853,6 @@ packages:
     hasBin: true
     dependencies:
       argparse: 2.0.1
-    dev: true
 
   /jsesc@2.5.2:
     resolution: {integrity: sha512-OYu7XEzjkCQ3C5Ps3QIZsQfNpqoJyZZA99wd9aWd05NCtC5pWOkShK2mkL6HXQR6/Cy2lbNdPlZBpuQHXE63gA==}

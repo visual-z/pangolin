@@ -13,27 +13,34 @@ import { RedisStore } from 'cache-manager-redis-yet';
 @Injectable()
 export class AuthenticationTask implements OnApplicationBootstrap {
   private readonly logger: Logger = new Logger(AuthenticationTask.name);
+
   public constructor(
     private httpService: HttpService,
     private readonly configService: ConfigService,
-    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache<RedisStore>,
+    @Inject(CACHE_MANAGER)
+    private readonly cacheManager: Cache<RedisStore>,
   ) {}
 
   public onApplicationBootstrap() {
     this.getUserList().catch((error) => {
-      this.logger.error(error);
+      this.logger.error(JSON.stringify(error));
     });
   }
 
   public async getToken() {
     await this.cacheManager.store.client.del('zentao:token');
     const tokenResponse = await this.httpService.axiosRef.post(
-      `${this.configService.get('ZENTAO_URL')}/api.php/v1/tokens`,
+      `${this.configService.getOrThrow('application.authentication.zentao.url')}/api.php/v1/tokens`,
       {
-        account: this.configService.get('ZENTAO_TOKEN_ACCOUNT'),
-        password: this.configService.get('ZENTAO_TOKEN_PASSWORD'),
+        account: this.configService.getOrThrow(
+          'application.authentication.zentao.account',
+        ),
+        password: this.configService.getOrThrow(
+          'application.authentication.zentao.password',
+        ),
       },
     );
+
     await this.cacheManager.set(
       'zentao:token',
       tokenResponse.data.token,
@@ -51,7 +58,7 @@ export class AuthenticationTask implements OnApplicationBootstrap {
     try {
       const userList = (
         await this.httpService.axiosRef.get(
-          `${this.configService.get('ZENTAO_URL')}/api.php/v1/users`,
+          `${this.configService.getOrThrow('application.authentication.zentao.url')}/api.php/v1/users`,
           {
             headers: {
               Token: token,

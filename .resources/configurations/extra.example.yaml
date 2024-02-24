@@ -1,0 +1,14 @@
+application:
+  authentication:
+    zentao:
+      url:
+      key:
+      code:
+      account:
+      password:
+    openid:
+      clientID:
+      clientSecret:
+      configUrl:
+      redirectUri:
+      scope:
