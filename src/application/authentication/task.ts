@@ -30,7 +30,7 @@ export class AuthenticationTask implements OnApplicationBootstrap {
   public async getToken() {
     await this.cacheManager.store.client.del('zentao:token');
     const tokenResponse = await this.httpService.axiosRef.post(
-      `${this.configService.getOrThrow('application.authentication.zentao.url')}/api.php/v1/tokens`,
+      `${this.configService.getOrThrow('application.authentication.zentao.httpUrl')}/api.php/v1/tokens`,
       {
         account: this.configService.getOrThrow(
           'application.authentication.zentao.account',
@@ -58,7 +58,7 @@ export class AuthenticationTask implements OnApplicationBootstrap {
     try {
       const userList = (
         await this.httpService.axiosRef.get(
-          `${this.configService.getOrThrow('application.authentication.zentao.url')}/api.php/v1/users`,
+          `${this.configService.getOrThrow('application.authentication.zentao.httpUrl')}/api.php/v1/users`,
           {
             headers: {
               Token: token,

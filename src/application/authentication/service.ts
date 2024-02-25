@@ -61,7 +61,7 @@ export class AuthenticationService {
         // 创建用户
         const password = generateRandomPassword(32);
         await this.httpService.axiosRef.post(
-          `${this.configService.getOrThrow('application.authentication.zentao.url')}/api.php/v1/users`,
+          `${this.configService.getOrThrow('application.authentication.zentao.httpUrl')}/api.php/v1/users`,
           {
             account: userInfo.preferred_username,
             password,
@@ -107,6 +107,6 @@ export class AuthenticationService {
           timestamp,
       )
       .digest('hex');
-    return `${this.configService.getOrThrow('application.authentication.zentao.url')}/api.php?m=user&f=apilogin&account=${userInfo.preferred_username}&code=${this.configService.getOrThrow('application.authentication.zentao.code')}&time=${timestamp}&token=${token}`;
+    return `${this.configService.getOrThrow('application.authentication.zentao.httpsUrl')}/api.php?m=user&f=apilogin&account=${userInfo.preferred_username}&code=${this.configService.getOrThrow('application.authentication.zentao.code')}&time=${timestamp}&token=${token}`;
   }
 }
