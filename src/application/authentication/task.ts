@@ -60,20 +60,22 @@ export class AuthenticationTask implements OnApplicationBootstrap {
       token = await this.cacheManager.get('zentao:token');
     }
     try {
-      const userList = (
-        await this.httpService.axiosRef.get(
-          `${this.configService.getOrThrow('application.authentication.zentao.httpUrl')}/api.php/v1/users`,
-          {
-            headers: {
-              Token: token,
-            },
-            params: {
-              page: 1,
-              limit: 1024,
-            },
+      const userResponse = await this.httpService.axiosRef.get(
+        `${this.configService.getOrThrow('application.authentication.zentao.httpUrl')}/api.php/v1/users`,
+        {
+          headers: {
+            Token: token,
           },
-        )
-      ).data.users.map((user: { account: string }) => user.account);
+          params: {
+            page: 1,
+            limit: 1024,
+          },
+        },
+      );
+      console.log(userResponse);
+      const userList = userResponse.data.users.map(
+        (user: { account: string }) => user.account,
+      );
       await this.cacheManager.store.client.sAdd('zentao:userList', userList);
     } catch (error) {
       this.logger.error(error);
