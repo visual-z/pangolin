@@ -41,6 +41,7 @@ export class AuthenticationTask implements OnApplicationBootstrap {
           ),
         },
       );
+      console.log(tokenResponse);
       await this.cacheManager.set(
         'zentao:token',
         tokenResponse.data.token,
