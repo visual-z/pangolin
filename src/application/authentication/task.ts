@@ -41,6 +41,7 @@ export class AuthenticationTask implements OnApplicationBootstrap {
           ),
         },
       );
+      console.log(JSON.stringify(tokenResponse));
       await this.cacheManager.set(
         'zentao:token',
         tokenResponse.data.token,
@@ -73,6 +74,7 @@ export class AuthenticationTask implements OnApplicationBootstrap {
           },
         )
       ).data.users.map((user: { account: string }) => user.account);
+      console.log(userList);
       await this.cacheManager.store.client.sAdd('zentao:userList', userList);
     } catch (error) {
       this.logger.error(error);
