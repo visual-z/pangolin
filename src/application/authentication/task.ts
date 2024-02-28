@@ -41,12 +41,12 @@ export class AuthenticationTask implements OnApplicationBootstrap {
           ),
         },
       );
-      console.log(JSON.stringify(tokenResponse));
-      await this.cacheManager.set(
-        'zentao:token',
-        tokenResponse.data.token,
-        2 ** 21,
-      );
+      console.log(tokenResponse);
+      await this.cacheManager
+        .set('zentao:token', tokenResponse.data.token, 2 ** 21)
+        .catch((error) => {
+          console.log(error);
+        });
     } catch (error) {
       this.logger.error(error);
     }
