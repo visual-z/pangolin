@@ -41,7 +41,6 @@ export class AuthenticationService {
             'application.authentication.openid.redirectUri',
           ),
         ],
-        response_types: ['code'],
       });
     });
   }
@@ -57,6 +56,7 @@ export class AuthenticationService {
         'zentao:userList',
         userInfo.name,
       );
+      console.log(result);
       if (result === false) {
         // 创建用户
         const password = generateRandomPassword(32);
@@ -86,9 +86,11 @@ export class AuthenticationService {
           }),
         );
       } else {
+        console.log('跳转登录辣');
         response.redirect(this.login(<User.Info>userInfo));
       }
     } catch (error) {
+      console.log('报错啦！');
       this.logger.error(error);
       response.status(500);
     }
