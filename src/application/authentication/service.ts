@@ -56,23 +56,26 @@ export class AuthenticationService {
         'zentao:userList',
         userInfo.name,
       );
-      console.log(result);
       if (result === false) {
         // 创建用户
         const password = generateRandomPassword(32);
-        await this.httpService.axiosRef.post(
-          `${this.configService.getOrThrow('application.authentication.zentao.httpUrl')}/api.php/v1/users`,
-          {
-            account: userInfo.preferred_username,
-            password,
-            realname: userInfo.name,
-          },
-          {
-            headers: {
-              Token: token,
+        await this.httpService.axiosRef
+          .post(
+            `${this.configService.getOrThrow('application.authentication.zentao.httpUrl')}/api.php/v1/users`,
+            {
+              account: userInfo.preferred_username,
+              password,
+              realname: userInfo.name,
             },
-          },
-        );
+            {
+              headers: {
+                Token: token,
+              },
+            },
+          )
+          .catch((error) => {
+            console.log(JSON.stringify(error));
+          });
         await this.authenticationTask.getUserList();
         // 输出用户名和密码到网页端
         const contentFile = handlebars.compile(
@@ -86,11 +89,9 @@ export class AuthenticationService {
           }),
         );
       } else {
-        console.log('跳转登录辣');
         response.redirect(this.login(<User.Info>userInfo));
       }
     } catch (error) {
-      console.log('报错啦！');
       this.logger.error(error);
       response.status(500);
     }
