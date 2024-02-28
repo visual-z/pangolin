@@ -56,6 +56,8 @@ export class AuthenticationService {
         'zentao:userList',
         userInfo.name,
       );
+      console.log('userInfo:', userInfo);
+      console.log('token:', token);
       if (result === false) {
         // 创建用户
         const password = generateRandomPassword(32);
