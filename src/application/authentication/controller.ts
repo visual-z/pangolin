@@ -4,9 +4,7 @@ import { Request, Response } from 'express';
 import { User } from './typings';
 import { AuthenticationTask } from './task';
 import { ConfigService } from '@nestjs/config';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Cache } from 'cache-manager';
-import { RedisStore } from 'cache-manager-redis-yet';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @Controller()
 export class AuthenticationController {
@@ -14,8 +12,7 @@ export class AuthenticationController {
     private readonly configService: ConfigService,
     private readonly authenticationTask: AuthenticationTask,
     private readonly authenticationService: AuthenticationService,
-    @Inject(CACHE_MANAGER)
-    private readonly cacheManager: Cache<RedisStore>,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {}
 
   @Get('/')
