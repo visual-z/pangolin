@@ -4,7 +4,9 @@ import { Request, Response } from 'express';
 import { User } from './typings';
 import { AuthenticationTask } from './task';
 import { ConfigService } from '@nestjs/config';
-import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
+import { RedisStore } from 'cache-manager-redis-yet';
 
 @Controller()
 export class AuthenticationController {
@@ -12,7 +14,8 @@ export class AuthenticationController {
     private readonly configService: ConfigService,
     private readonly authenticationTask: AuthenticationTask,
     private readonly authenticationService: AuthenticationService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    @Inject(CACHE_MANAGER)
+    private readonly cacheManager: Cache<RedisStore>,
   ) {}
 
   @Get('/')
@@ -36,9 +39,10 @@ export class AuthenticationController {
         .getClient()
         .userinfo(payload.access_token);
       //
-      const token: string | null = await this.cacheManager.get('token');
+      let token: string | null = await this.cacheManager.get('zentao:token');
       if (!token) {
         await this.authenticationTask.getToken();
+        token = await this.cacheManager.get('zentao:token');
       }
       //
       await this.authenticationService.getZenTaoUser(
