@@ -28,28 +28,23 @@ export class AuthenticationTask implements OnApplicationBootstrap {
   }
 
   public async getToken() {
-    try {
-      await this.cacheManager.store.client.del('zentao:token');
-      const tokenResponse = await this.httpService.axiosRef.post(
-        `${this.configService.getOrThrow('application.authentication.zentao.httpUrl')}/api.php/v1/tokens`,
-        {
-          account: this.configService.getOrThrow(
-            'application.authentication.zentao.account',
-          ),
-          password: this.configService.getOrThrow(
-            'application.authentication.zentao.password',
-          ),
-        },
-      );
-      console.log(tokenResponse);
-      await this.cacheManager
-        .set('zentao:token', tokenResponse.data.token, 2 ** 21)
-        .catch((error) => {
-          console.log(error);
-        });
-    } catch (error) {
-      this.logger.error(error);
-    }
+    await this.cacheManager.store.client.del('zentao:token');
+    const tokenResponse = await this.httpService.axiosRef.post(
+      `${this.configService.getOrThrow('application.authentication.zentao.httpUrl')}/api.php/v1/tokens`,
+      {
+        account: this.configService.getOrThrow(
+          'application.authentication.zentao.account',
+        ),
+        password: this.configService.getOrThrow(
+          'application.authentication.zentao.password',
+        ),
+      },
+    );
+    await this.cacheManager.store.client
+      .set('zentao:token', tokenResponse.data.token, { PX: 2 ** 21 })
+      .catch((error) => {
+        console.log(error);
+      });
   }
 
   public async getUserList() {
@@ -74,7 +69,6 @@ export class AuthenticationTask implements OnApplicationBootstrap {
           },
         )
       ).data.users.map((user: { account: string }) => user.account);
-      console.log(userList);
       await this.cacheManager.store.client.sAdd('zentao:userList', userList);
     } catch (error) {
       this.logger.error(error);
