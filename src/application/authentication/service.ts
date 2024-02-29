@@ -53,7 +53,7 @@ export class AuthenticationService {
     try {
       // 缓存
       const result = await this.cacheManager.store.client.SISMEMBER(
-        'Pangolin:Zentao:userList',
+        'AuthenticationTask:userList',
         userInfo.name,
       );
       if (result === false) {

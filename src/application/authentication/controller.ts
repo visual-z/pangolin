@@ -40,12 +40,12 @@ export class AuthenticationController {
         .userinfo(payload.access_token);
       //
       let token: string | null = await this.cacheManager.store.client.get(
-        'Pangolin:Zentao:token',
+        'AuthenticationTask:token',
       );
       if (!token) {
         await this.authenticationTask.getToken();
         token = await this.cacheManager.store.client.get(
-          'Pangolin:Zentao:token',
+          'AuthenticationTask:token',
         );
       }
       //
